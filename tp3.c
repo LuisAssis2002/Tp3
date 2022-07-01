@@ -1,6 +1,16 @@
 #include "ShiftAndExato.h"
+#include "KMP.h"
+#include "BMH.h"
+#include <sys/time.h>
+#include <time.h>
 
 int main(int argc, char *argv[]){
+
+    // definindo o tempo de execução
+    struct timeval start, end;
+    float tmp_exec;
+    gettimeofday(&start, NULL);
+
     int a, metodo = 0;
     sequencia arranjo1, arranjo2;
     FILE *file = fopen("saida.txt", "w");
@@ -40,19 +50,40 @@ int main(int argc, char *argv[]){
         limpeza(&arranjo1);
         limpeza(&arranjo2);
         }
+        free(M);
     }
     if(metodo == 3){
         while(1){
         leitor_de_arquivo(&arranjo1, &arranjo2, file);
-        //inserir aqui a funcao BMH, ex: a = BMH(&arranjo1, &arranjo2);
+        a = BMH(&arranjo1, &arranjo2);
         if(a == -7) break;
         gravador(a);
         limpeza(&arranjo1);
         limpeza(&arranjo2);
         }
     }
+    if(metodo == 4){
+        dfa *D;
+        while(1){
+        leitor_de_arquivo(&arranjo1, &arranjo2, file);
+        D = cria_dfa(&arranjo1, &arranjo2, D);
+        a = KMP(&arranjo1, D, arranjo2.tamanho);
+        //inserir aqui a funcao BMH, ex: a = BMH(&arranjo1, &arranjo2);
+        if(a == -7) break;
+        gravador(a);
+        limpeza_dfas(D , arranjo1.tamanho);
+        limpeza(&arranjo1);
+        limpeza(&arranjo2);
+        }
+        free(D);
+    }
     //fim dos metodos
     
     fclose(file);
+    
+    // captura do tempo de execução
+    gettimeofday(&end, NULL);
+    tmp_exec = end.tv_sec - start.tv_sec;
+    printf("\ntempo de: %.4f\n", tmp_exec);
     return 0;
 }

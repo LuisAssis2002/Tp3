@@ -1,3 +1,5 @@
+#ifndef Musica_H
+#define Musica_H
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,3 +14,5 @@ void limpeza(sequencia*);
 void gravador(int);
 int comparador(int, int);
 int forca_bruta(sequencia*, sequencia*);
+
+#endif
