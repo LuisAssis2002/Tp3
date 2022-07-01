@@ -23,10 +23,7 @@ dfa* cria_dfa(sequencia *arranjo1, sequencia *arranjo2, dfa *D){
                 k = 0;
             }
             ant = aux;
-            printf("%d ", D[i].masc[j]);
-            printf("- %d, ", D[i].potencias[j]);
         }
-        printf("\n");
     }
     return D;
 }
@@ -37,7 +34,6 @@ int KMP(sequencia *arranjo1, dfa *D, int m){
     for(int i = 0; ((i <= (arranjo1->tamanho -(m - j))) && (i < arranjo1->tamanho)); i++){
         aux = m - 1;
         j = D[i].masc[j];
-        printf("%d ", j);
         if(j == m){
             for(int k = i; k > ((i - m) + 1); k--){
                 if(D[k].potencias[aux] != D[k - 1].potencias[aux - 1]){
@@ -55,12 +51,10 @@ int KMP(sequencia *arranjo1, dfa *D, int m){
                         if((rep == 0) && (a == (m - 1))) j = rep;
                         ant = aux2;
                     }
-                    printf("baixa\n");
                     break;
                 }
                 aux--;
             }
-            printf("\n");
             if(j == m) return (i - (m-1));
         }
     }

@@ -28,14 +28,11 @@ int shift_and_exato(sequencia *arranjo1, mascara *M, int m){
     for(int i = 0; (i < arranjo1->tamanho); i++){
         aux = m - 1;
         R = (r >> 1) | (int) pow(2, (m - 1));
-        printf("2 - R: %d ", R);
         r = R & M[i].masc;
-        printf("r: %d\n", r);
         if((r & 1) == 1){
             for(int j = i; j > ((i - m)+1); j--){
                 if(M[j].potencias[aux] != M[j - 1].potencias[aux- 1]){
                     r--;
-                    printf("baixa\n");
                     break;
                 }
                 aux--;

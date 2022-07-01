@@ -214,7 +214,7 @@ int comparador(int Nota1, int Nota2){
 int forca_bruta(sequencia *arranjo1, sequencia *arranjo2){
     int potencia_anterior, potencia_atual;
     if((arranjo1->tamanho == 0) && (arranjo2->tamanho == 0)) return -7;
-    for(int i = 0; i < arranjo1->tamanho; i++){
+    for(int i = 0; ((i < arranjo1->tamanho) && (i <= arranjo1->tamanho - arranjo2->tamanho)); i++){
         potencia_anterior = -6;
         for(int j = 0; j < arranjo2->tamanho; j++){
             potencia_atual = comparador(arranjo1->notas[i+j], arranjo2->notas[j]);
