@@ -1,10 +1,10 @@
 #include "ShiftAndExato.h"
 
-//cria as mascaras do ShiftAnd
+//cria as mascaras do ShiftAnd, laocando os espaços necessarios na memória
 mascara* cria_mascaras(sequencia *arranjo1, sequencia *arranjo2, mascara *M){
     M = (mascara*) malloc(arranjo1->tamanho * sizeof(mascara));
     int aux;
-    for(int i = 0; i < arranjo1->tamanho; i++){
+    for(int i = 0; i < arranjo1->tamanho; i++){ //aloca o array responsável por guardar as distâncias entre dono da mascara e as notas do padrão
         M[i].potencias = (int*) malloc(arranjo2->tamanho * sizeof(int));
         M[i].masc = 0;
         for(int j = 1; j <= arranjo2->tamanho; j++){
@@ -24,13 +24,13 @@ mascara* cria_mascaras(sequencia *arranjo1, sequencia *arranjo2, mascara *M){
 */
 int shift_and_exato(sequencia *arranjo1, mascara *M, int m){
     int R = 0, r = 0, aux;
-    if((arranjo1->tamanho == 0) && (m == 0)) return -7;
+    if((arranjo1->tamanho == 0) && (m == 0)) return -7; //Verifica a ocorrência da entrada de finalização do programa ("0 0").
     for(int i = 0; (i < arranjo1->tamanho); i++){
         aux = m - 1;
         R = (r >> 1) | (int) pow(2, (m - 1));
         r = R & M[i].masc;
-        if((r & 1) == 1){
-            for(int j = i; j > ((i - m)+1); j--){
+        if((r & 1) == 1){ //Verifica a ocorrência do casamento completo
+            for(int j = i; j > ((i - m)+1); j--){ //Verifica se ambôs os termos encontrados possuem paridade em suas distâncias de ressonância com o padrão.
                 if(M[j].potencias[aux] != M[j - 1].potencias[aux- 1]){
                     r--;
                     break;

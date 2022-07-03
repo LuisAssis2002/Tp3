@@ -3,5 +3,6 @@
 #include "Musica.h"
 
 int BMH(sequencia*, sequencia*);
+int* pre_proces(sequencia*, int *);
 
 #endif

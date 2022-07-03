@@ -1,21 +1,21 @@
 #include "Musica.h"
 
-//lê o tamanho e as notas de dois arranjos de notas
+//lê o tamanho e registra em dois arranjos as notas, sendo o arranjo1 = texto principal, e o arranjo2 = padrão
 void leitor_de_arquivo(sequencia *arranjo1, sequencia *arranjo2, FILE* file){
     int n = 0;
     char Nota[2];
     size_t len = 0;
     ssize_t r;
     fscanf(file, "%d %d", &arranjo1->tamanho, &arranjo2->tamanho);
-    if((arranjo1->tamanho == 0) && (arranjo2->tamanho == 0)) return;
+    if((arranjo1->tamanho == 0) && (arranjo2->tamanho == 0)) return; //Verifica a ocorrência da entrada de finalização do programa ("0 0").
     char *leitor = NULL;
     arranjo1->notas = (int*) malloc(arranjo1->tamanho * sizeof(int));
     arranjo2->notas = (int*) malloc(arranjo2->tamanho * sizeof(int));
-    while((r = getline(&leitor, &len, file)) != -1){
-        for(int i = 0; i < len; i++){
+    while((r = getline(&leitor, &len, file)) != -1){ //captura o arranjo principal
+        for(int i = 0; i < len; i++){ //navega pelos caracters
             if((leitor[i] == '\n') || (leitor[i] == '\0')) break; //para a busca na linha
             else if(leitor[i] == ' ') continue;
-            else{
+            else{ //relaciona os notas aos valores das posições delas na escala principal, convertendo assim as notas para números, e então as guarda no arranjo
                 if(leitor[i] == 'A'){
                     if(leitor[i + 1] == '#'){
                         arranjo1->notas[n] = 2;
@@ -83,6 +83,7 @@ void leitor_de_arquivo(sequencia *arranjo1, sequencia *arranjo2, FILE* file){
         if(n == arranjo1->tamanho) break;
     }
     n = 0;
+    //o processo é repetido para o arranjo2
     while((r = getline(&leitor, &len, file)) != -1){
         for(int i = 0; i < len; i++){
             if((leitor[i] == '\n') || (leitor[i] == '\0')) break; //para a busca na linha
@@ -165,17 +166,17 @@ void limpeza(sequencia *arranjo){
 //grava os resultados no arquivo saida.txt
 void gravador(int a){
     FILE *file = fopen("saida.txt", "a");
-    if(a != -6) fprintf(file, "S %d\n", a);
-    else fprintf(file, "N\n");
+    if(a != -6) fprintf(file, "S %d\n", a); //caso haja a ocorrência, a != -6, então a posição é gravada no arquivo
+    else fprintf(file, "N\n"); //caso contrário a negação é gravada
     fclose(file);
 }
 
-//compara duas notas e retorna 1 caso elas sejam de uma frequência semelhante e -6 caso não
+//compara duas notas e retorna o valor da distância entre elas, em (potência de 2) + 1 caso elas sejam de uma frequência semelhante e -6 caso não
 int comparador(int Nota1, int Nota2){
     float aux;
     int u, potencia = 0;
     if(Nota1 == Nota2) return potencia;
-    if(Nota1 > Nota2){
+    if(Nota1 > Nota2){ //realiza a busca para frente na escala
         aux = Nota1 - Nota2;
         u = 1;
     }
@@ -185,25 +186,25 @@ int comparador(int Nota1, int Nota2){
     }
     if(aux == 1) return 1;
     if(aux == -1) return -1;
-    while((aux >= 2) || (aux <= -2)){
+    while((aux >= 2) || (aux <= -2)){ 
         aux = aux / 2;
         potencia++;
     }
     potencia = (u * potencia) + u;
-    if((aux == 1) || (aux == -1)) return potencia;
-    if(Nota1 > Nota2) aux = (Nota1 - Nota2) - (u * 12);
+    if((aux == 1) || (aux == -1)) return potencia; //fim da busca crescente
+    if(Nota1 > Nota2) aux = (Nota1 - Nota2) - (u * 12); //realiza a busca para trás na escala, caso a primeira busca não encontre paridade
     if(Nota2 > Nota1) aux = (-(Nota2 - Nota1)) - (u * 12);
     if(aux == 1) return 1;
     if(aux == -1) return -1;
     potencia = 0;
 
-    while((aux >= 2) || (aux <= -2)){
+    while((aux >= 2) || (aux <= -2)){ 
         aux = aux / 2;
         potencia++;
     }
 
     potencia = (-u) * (potencia + 1);
-    if((aux == 1) || (aux == -1)) return potencia;
+    if((aux == 1) || (aux == -1)) return potencia; //fim da busca decrescente
     return -6;
 }
 
@@ -213,16 +214,16 @@ int comparador(int Nota1, int Nota2){
 */
 int forca_bruta(sequencia *arranjo1, sequencia *arranjo2){
     int potencia_anterior, potencia_atual;
-    if((arranjo1->tamanho == 0) && (arranjo2->tamanho == 0)) return -7;
-    for(int i = 0; ((i < arranjo1->tamanho) && (i <= arranjo1->tamanho - arranjo2->tamanho)); i++){
+    if((arranjo1->tamanho == 0) && (arranjo2->tamanho == 0)) return -7; //Verifica a ocorrência da entrada de finalização do programa ("0 0").
+    for(int i = 0; ((i < arranjo1->tamanho) && (i <= arranjo1->tamanho - arranjo2->tamanho)); i++){ //realiza o deslocamento pelo arranjo principal
         potencia_anterior = -6;
-        for(int j = 0; j < arranjo2->tamanho; j++){
-            potencia_atual = comparador(arranjo1->notas[i+j], arranjo2->notas[j]);
-            if(((potencia_atual == potencia_anterior) || (potencia_anterior == -6)) && (potencia_atual != -6)){
-                potencia_anterior = potencia_atual;
+        for(int j = 0; j < arranjo2->tamanho; j++){ //guarda a distância de paridade dos elementos autais
+            potencia_atual = comparador(arranjo1->notas[i+j], arranjo2->notas[j]); //
+            if(((potencia_atual == potencia_anterior) || (potencia_anterior == -6)) && (potencia_atual != -6)){ //verifica-se as distâncias de paridade, anteior e atual sejam iguais
+                potencia_anterior = potencia_atual; //guarda a distância de paridade dos elementos anteriores para o proximo loop
             }
-            else break;
-            if(j == (arranjo2->tamanho - 1)) return i;
+            else break; //Caso as distâncias sejam diferentes o loop termina
+            if(j == (arranjo2->tamanho - 1)) return i; //caso o loop interno chegue ao seu final o casamento foi encontrado
         }
     }
     return -6;
